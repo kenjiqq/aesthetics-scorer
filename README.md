@@ -12,7 +12,7 @@
 
 ```
 @article{wangDiffusionDBLargescalePrompt2022,
-  title = :  Large-Scale Prompt Gallery Dataset for Text-to-Image Generative Models},
+  title = {Large-Scale Prompt Gallery Dataset for Text-to-Image Generative Models},
   author = {Wang, Zijie J. and Montoya, Evan and Munechika, David and Yang, Haoyang and Hoover, Benjamin and Chau, Duen Horng},
   year = {2022},
   journal = {arXiv:2210.14896 [cs]},
