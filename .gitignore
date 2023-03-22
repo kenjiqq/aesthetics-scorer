@@ -1,0 +1,7 @@
+*.egg-info
+venv/
+dataset/
+__pycache__/
+wandb/
+.vscode/
+parquets/

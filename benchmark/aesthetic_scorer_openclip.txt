@@ -1,0 +1,12 @@
+aesthetics_scorer_openclip_vit_bigg_14
+Loss L1: 1.05861
+Loss L2: 1.7372991
+
+aesthetics_scorer_openclip_vit_h_14
+Loss L1: 1.060379
+Loss L2: 1.7439902
+
+aesthetics_scorer_openclip_vit_l_14
+Loss L1: 1.0641568
+Loss L2: 1.7549098
+
