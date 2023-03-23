@@ -10,7 +10,7 @@ Predicts aesthetic scores for images. Trained on Stable Hord user ratings of Sta
 * [openclip_vit_l_14](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_openclip_vit_l_14.html)
 
 ### Openclip_vit_h_14 model on subset of laion5b
-* [laion5b](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize/laion5b-visualize.html)
+* [laion5b](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/laion5b-visualize.html)
 
 ## Credits
 * Inspired by https://github.com/christophschuhmann/improved-aesthetic-predictor
