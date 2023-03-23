@@ -2,6 +2,15 @@
 
 Predicts aesthetic scores for images. Trained on Stable Hord user ratings of Stable Diffusion generated images.
 
+## Usage 
+
+Model files in aesthetics_scorer folder
+
+Simple gradio demo
+```bash
+python aesthetics_scorer/demo.py
+```
+
 ## Visualized results
 
 ### Different clip models on validation split of dataset
