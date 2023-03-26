@@ -16,6 +16,9 @@ if(DOWNLOAD):
 diffusion_df = pd.read_parquet('parquets/diffusion_db.parquet')
 hord_score_df = pd.read_parquet('parquets/hord_diffusiondb_scores.parquet')
 
+# Filter duplicate ratings from the same user
+unique_hord_df = hord_score_df[hord_score_df[["id", "user_id"]].duplicated(keep=False) == False]
+
 # Unique images with different counts:
 unique_hord_df = hord_score_df.groupby("id").agg({"ratings_count": "count", "rating": "mean", "artifacts": "mean"}).reset_index()
 

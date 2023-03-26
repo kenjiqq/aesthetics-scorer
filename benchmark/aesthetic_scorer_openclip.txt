@@ -1,12 +1,5 @@
-aesthetics_scorer_openclip_vit_bigg_14
-Loss L1: 1.05861
-Loss L2: 1.7372991
-
-aesthetics_scorer_openclip_vit_h_14
-Loss L1: 1.060379
-Loss L2: 1.7439902
-
-aesthetics_scorer_openclip_vit_l_14
-Loss L1: 1.0641568
-Loss L2: 1.7549098
-
+|    | name                                   |   Full: L1 |   Full: L2 |   Rating 0 - 3: L1 |   Rating 0 - 3: L2 |   Rating 3 - 7: L1 |   Rating 3 - 7: L2 |   Rating 7 - 10: L1 |   Rating 7 - 10: L2 |
+|---:|:---------------------------------------|-----------:|-----------:|-------------------:|-------------------:|-------------------:|-------------------:|--------------------:|--------------------:|
+|  0 | aesthetics_scorer_openclip_vit_bigg_14 |    1.05358 |    1.72679 |            2.14669 |            5.21509 |           0.854536 |            1.122   |             1.56933 |             3.13213 |
+|  1 | aesthetics_scorer_openclip_vit_h_14    |    1.0601  |    1.7439  |            2.15224 |            5.24939 |           0.859703 |            1.13231 |             1.5831  |             3.17789 |
+|  2 | aesthetics_scorer_openclip_vit_l_14    |    1.06155 |    1.75124 |            2.17635 |            5.35526 |           0.860795 |            1.13722 |             1.57781 |             3.1591  |

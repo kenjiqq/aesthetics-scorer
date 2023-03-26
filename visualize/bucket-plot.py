@@ -43,7 +43,7 @@ def generate_bucket_section(a, b, total_part):
     """Generate an HTML section for the given bucket range."""
     count_part = len(total_part) / len(df) * 100
     estimated = int(len(total_part))
-    part = total_part[:50]
+    part = total_part[:100]
     html = f"<h2>In bucket {a} - {b} there is {count_part:.2f}% samples:{estimated:.2f} </h2> <div>"
     for image_name in part["image_name"]:
         image_path = os.path.join("dataset", image_name)
