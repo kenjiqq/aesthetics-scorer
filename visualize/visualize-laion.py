@@ -1,90 +1,40 @@
 # Based on from https://raw.githubusercontent.com/christophschuhmann/improved-aesthetic-predictor/main/visulaize_100k_from_LAION400M.py
 
-import webdataset as wds
-from PIL import Image
-import io
-import matplotlib.pyplot as plt
-import json
-
-from warnings import filterwarnings
-
-
 # os.environ["CUDA_VISIBLE_DEVICES"] = "0"    # choose GPU if you are on a multi GPU server
 import numpy as np
 import torch
-import torch.nn as nn
-from torchvision import datasets, transforms
 from tqdm import tqdm
-
-from os.path import join
-from datasets import load_dataset
 import pandas as pd
-from torch.utils.data import Dataset, DataLoader, ChainDataset
-import json
-
-from PIL import Image, ImageFile
 
 from aesthetics_scorer.model import load_model, preprocess
-from transformers import CLIPModel, CLIPProcessor
 
 CLIP_MODEL = "laion/CLIP-ViT-H-14-laion2B-s32B-b79K"
 SCORER_MODEL = "aesthetics_scorer/aesthetics_scorer_openclip_vit_h_14.pth"
 
+laion_embedding_df = pd.read_parquet("parquets/laion_embeddings.parquet")
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
-model = CLIPModel.from_pretrained(CLIP_MODEL)
-vision_model = model.vision_model
-vision_model.to(device)
-del model
-clip_processor = CLIPProcessor.from_pretrained(CLIP_MODEL)
-
 rating_model = load_model(SCORER_MODEL).to(device)
-
-vision_model.eval()
 rating_model.eval()
 
-urls= []
-predictions=[]
+embeddings = np.array(laion_embedding_df["pooled_output"].to_list())
 
-# this will run inference over 10 webdataset tar files from LAION 400M and sort them into 20 categories
-# you can DL LAION 400M and convert it to wds tar files with img2dataset ( https://github.com/rom1504/img2dataset ) 
 
-datasets = []
-for j in range(100):
-   if j<10:
-     # change the path to the tar files accordingly
-     datasets.append( wds.WebDataset("laion2b-en/dataset/0000"+str(j)+".tar"))
-   else:
-     datasets.append(wds.WebDataset("laion2b-en/dataset/000"+str(j)+".tar"))
+urls = np.array(laion_embedding_df["image_url"].to_list())
+predictions = []
 
-dataset = ChainDataset(datasets)
-
-def collate_fn(batch):
-   for item in batch:
-      item["url"] = json.loads(item['json'])["url"]
-   return batch
-
-data_loader = DataLoader(dataset, batch_size=512, shuffle=False, collate_fn=collate_fn )
-batch_metadata = []
-batch_images = []
-for i, batch in tqdm(enumerate(data_loader)):
-   batch_urls = [item["url"] for item in batch]
-   pil_images = [Image.open(io.BytesIO(item["jpg"])) for item in batch]
-   
-   images = clip_processor(images=pil_images, return_tensors="pt").to(device)
-
+BATCH_SIZE = 1024
+for pos in tqdm(range(0, len(embeddings), BATCH_SIZE)):
+   batch_embeddings = embeddings[pos:pos+BATCH_SIZE]
+   batch_embeddings = preprocess(torch.Tensor(batch_embeddings).to(device))
    with torch.no_grad():
-      image_features = vision_model(**images)
-
-   embedding = preprocess(image_features.pooler_output)
-   with torch.no_grad():
-      prediction = rating_model(embedding)
-   urls.extend(batch_urls)
-   predictions.extend(prediction.detach().cpu())
+      prediction = rating_model(batch_embeddings)
+   predictions.extend([x.item() for x in prediction.detach().cpu()])
 
 
 df = pd.DataFrame(list(zip(urls, predictions)),
-               columns =['filepath', 'prediction'])
+   columns =['filepath', 'prediction'])
 
 
 BUCKET_STEP = 0.25
