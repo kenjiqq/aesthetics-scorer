@@ -19,6 +19,9 @@ hord_score_df = pd.read_parquet('parquets/hord_diffusiondb_scores.parquet')
 # Filter duplicate ratings from the same user
 unique_hord_df = hord_score_df[hord_score_df[["id", "user_id"]].duplicated(keep=False) == False]
 
+# Filter images from the hord anaonymous user
+unique_hord_df = unique_hord_df[unique_hord_df["kudos"] != -50]
+
 # Unique images with different counts:
 unique_hord_df = hord_score_df.groupby("id").agg({"ratings_count": "count", "rating": "mean", "artifacts": "mean"}).reset_index()
 
@@ -38,7 +41,6 @@ train_split_df, validate_split_df = np.split(mixed_diffusion_df.sample(frac=1, r
 mixed_diffusion_df.to_parquet("parquets/prepared_hord_diffusion_dataset.parquet")
 train_split_df.to_parquet("parquets/train_split.parquet")
 validate_split_df.to_parquet("parquets/validate_split.parquet")
-
 
 # Set up the figure with two subplots
 fig, axs = plt.subplots(3, 2, figsize=(13, 15))

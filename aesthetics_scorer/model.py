@@ -55,7 +55,18 @@ class AestheticScorer(nn.Module):
         split_name = os.path.splitext(save_name)
         with open(f"{split_name[0]}.config", "w") as outfile:
             outfile.write(json.dumps(self.config, indent=4))
-        torch.save(self.state_dict(), save_name)
+
+        for i in range(6): # saving sometiles fails, so retry 5 times, might be windows issue
+            try:
+                torch.save(self.state_dict(), save_name)
+                break
+            except RuntimeError as e:
+                # check if error contains string "File"
+                if "cannot be opened" in str(e) and i < 5:
+                    print("Model save failed, retrying...")
+                else:
+                    raise e
+        
 
 def preprocess(embeddings):
     return embeddings / embeddings.norm(p=2, dim=-1, keepdim=True)

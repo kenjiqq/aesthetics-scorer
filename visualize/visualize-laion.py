@@ -12,6 +12,13 @@ CLIP_MODEL = "laion/CLIP-ViT-H-14-laion2B-s32B-b79K"
 SCORER_MODEL = "aesthetics_scorer/aesthetics_scorer_openclip_vit_h_14.pth"
 
 laion_embedding_df = pd.read_parquet("parquets/laion_embeddings.parquet")
+laion_info = pd.read_parquet("laion2b/parquet/dataset.parquet")
+
+#merge laion embeddings with test on image_url and URL
+laion_embedding_df = laion_embedding_df.merge(laion_info, left_on="image_url", right_on="URL")
+
+# filter nsfw images
+laion_embedding_df = laion_embedding_df[(laion_embedding_df["NSFW"] != "UNSURE") & (laion_embedding_df["NSFW"] != "NSFW")]
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 
@@ -47,7 +54,7 @@ for [a,b] in buckets:
     total_part = df[(  (df["prediction"] ) *1>= a) & (  (df["prediction"] ) *1 <= b)]
     count_part = len(total_part) / len(df) * 100
     estimated =int ( len(total_part) )
-    part = total_part[:50]
+    part = total_part.sample(min(len(total_part), 50))
 
     html+=f"<h2>In bucket {a} - {b} there is {count_part:.2f}% samples:{estimated:.2f} </h2> <div>"
     for filepath in part["filepath"]:
