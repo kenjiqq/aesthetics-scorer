@@ -2,6 +2,8 @@ import requests
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import random
+import math
 
 DOWNLOAD = True
 
@@ -23,7 +25,21 @@ unique_hord_df = hord_score_df[hord_score_df[["id", "user_id"]].duplicated(keep=
 unique_hord_df = unique_hord_df[unique_hord_df["kudos"] != -50]
 
 # Unique images with different counts:
-unique_hord_df = hord_score_df.groupby("id").agg({"ratings_count": "count", "rating": "mean", "artifacts": "mean"}).reset_index()
+unique_hord_df = hord_score_df.groupby("id").agg({"ratings_count": "count", "rating": ["median", "mean"], "artifacts": ["median", "mean"]}).reset_index()
+
+def fancy_round(x):
+    if x["median"].is_integer() or math.isnan(x["median"]):
+        return x["median"]
+    elif x["median"] == x["mean"]:
+        return round(random.choice([0.1, -0.1]) + x["median"], 0)
+    else:
+        return float(math.ceil(x["median"]) if x["mean"] > x["median"] else math.floor(x["median"]))
+
+# Round ratings and artifacts to whole numbers, round to closest number towards mean
+unique_hord_df["rating"] = unique_hord_df["rating"].apply(fancy_round, axis=1)
+unique_hord_df["artifacts"] = unique_hord_df["artifacts"] = unique_hord_df["artifacts"].apply(fancy_round, axis=1)
+unique_hord_df = unique_hord_df.drop(columns=[("rating", "mean"), ("artifacts", "mean")])
+unique_hord_df.columns = unique_hord_df.columns.get_level_values(0)
 
 #filter images with low rating count
 unique_hord_df = unique_hord_df[unique_hord_df["ratings_count"] >= 3 ]
@@ -47,13 +63,13 @@ fig, axs = plt.subplots(3, 2, figsize=(13, 15))
 
 def plot(row, title, df):
      # Plot the first histogram on the first subplot
-    axs[row, 0].hist(df["rating"], bins=15, density=False, color='blue', edgecolor='black')
+    axs[row, 0].hist(df["rating"], bins=10, density=False, color='blue', edgecolor='black')
     axs[row, 0].set_xlabel('Rating')
     axs[row, 0].set_ylabel('Count')
     axs[row, 0].set_title(title)
 
     # Plot the second histogram on the second subplot
-    axs[row, 1].hist(df["artifacts"], bins=15, density=False, color='blue', edgecolor='black')
+    axs[row, 1].hist(df["artifacts"], bins=5, density=False, color='blue', edgecolor='black')
     axs[row, 1].set_xlabel('Artifacts')
     axs[row, 1].set_ylabel('Count')
     axs[row, 1].set_title(title)

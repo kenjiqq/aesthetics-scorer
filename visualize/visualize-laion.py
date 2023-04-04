@@ -44,8 +44,8 @@ df = pd.DataFrame(list(zip(urls, predictions)),
    columns =['filepath', 'prediction'])
 
 
-BUCKET_STEP = 0.25
-buckets = [(i, i + BUCKET_STEP) for i in np.arange(0, 10+BUCKET_STEP, BUCKET_STEP)]
+BUCKET_STEP = 0.5
+buckets = [(i, i + BUCKET_STEP) for i in np.arange(0, 10, BUCKET_STEP)]
 
 
 html= f"<h1>Aesthetic scores for {len(predictions)} LAION 5b samples</h1>"
