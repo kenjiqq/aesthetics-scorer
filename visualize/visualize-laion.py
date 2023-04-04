@@ -36,7 +36,7 @@ for pos in tqdm(range(0, len(embeddings), BATCH_SIZE)):
    batch_embeddings = embeddings[pos:pos+BATCH_SIZE]
    batch_embeddings = preprocess(torch.Tensor(batch_embeddings).to(device))
    with torch.no_grad():
-      prediction = rating_model(batch_embeddings)
+      prediction = torch.clamp(rating_model(batch_embeddings), 1, 10)
    predictions.extend([x.item() for x in prediction.detach().cpu()])
 
 

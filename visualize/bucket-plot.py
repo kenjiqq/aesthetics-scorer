@@ -21,7 +21,7 @@ def openclip_rater(model_name, embeddings_file):
         embedding = np.array(row["pooled_output"])
         embedding = preprocess(torch.from_numpy(embedding).unsqueeze(0)).to("cuda")
         with torch.no_grad():
-            prediction = model(embedding)
+            prediction = torch.clamp(model(embedding), min=1, max=10)
         return prediction.item()
     
     return model_name, embeddings_df, predict
@@ -53,12 +53,12 @@ def generate_bucket_section(a, b, total_part):
     return html
 
 def make_html(name, df):
-    buckets = [(i, i + 1) for i in range(20)]
+    BUCKET_STEP = 0.5
+    buckets = [(i, i + BUCKET_STEP) for i in np.arange(1, 10, BUCKET_STEP)]
+    
     html = f'<h1>Rated images in buckets for {name}</h1>'
 
     for [a, b] in buckets:
-        a = a / 2
-        b = b / 2
         total_part = df[((df[name]) * 1 >= a) & ((df[name]) * 1 <= b)]
         html += generate_bucket_section(a, b, total_part)
 
