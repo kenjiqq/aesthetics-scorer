@@ -1,6 +1,6 @@
 # aesthetics-scorer
 
-Predicts aesthetic scores for images. Trained on Stable Hord user ratings of Stable Diffusion generated images.
+Predicts aesthetic scores for images. Trained on AI Horde community ratings of Stable Diffusion generated images.
 
 ## Usage 
 
