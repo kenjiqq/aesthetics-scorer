@@ -2,9 +2,12 @@
 
 Predicts aesthetic scores for images. Trained on AI Horde community ratings of Stable Diffusion generated images.
 
+[Huggingface demo](https://huggingface.co/spaces/kenjiqq/aesthetics-scorer)
+
 ## Usage 
 
-Model files in aesthetics_scorer folder
+
+Model files in aesthetics_scorer/models folder
 
 Simple gradio demo
 ```bash

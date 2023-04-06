@@ -13,6 +13,7 @@ del model
 clip_processor = CLIPProcessor.from_pretrained(MODEL)
 
 rating_model = load_model("aesthetics_scorer/models/aesthetics_scorer_rating_openclip_vit_h_14.pth").to(DEVICE)
+artifacts_model = load_model("aesthetics_scorer/models/aesthetics_scorer_artifacts_openclip_vit_h_14.pth").to(DEVICE)
 
 def predict(img):
     inputs = clip_processor(images=img, return_tensors="pt").to(DEVICE)
@@ -21,10 +22,13 @@ def predict(img):
     pooled_output = vision_output.pooler_output
     embedding = preprocess(pooled_output)
     with torch.no_grad():
-        output = rating_model(embedding)
-    return output.detach().cpu().item()
+        rating = rating_model(embedding)
+        artifact = artifacts_model(embedding)
+    return rating.detach().cpu().item(), artifact.detach().cpu().item()
 
-gr.Interface(fn=predict, 
-             inputs=gr.Image(type="pil"),
-             outputs="number"
+gr.Interface(
+    title="Aesthetics Scorer",
+    fn=predict,
+    inputs=gr.Image(type="pil"),
+    outputs=[gr.Number(label="Rating ~1-10 (high is good)"), gr.Number(label="Artifacts ~1-5 (low is good)")]
 ).launch()

@@ -72,11 +72,11 @@ def preprocess(embeddings):
     return embeddings / embeddings.norm(p=2, dim=-1, keepdim=True)
 
 
-def load_model(weight_path):
+def load_model(weight_path, device='cuda' if torch.cuda.is_available() else 'cpu'):
     split_path = os.path.splitext(weight_path)
     with open(f"{split_path[0]}.config", "r") as config_file:
         config = json.load(config_file)
     model = AestheticScorer(config=config)
-    model.load_state_dict(torch.load(weight_path))
+    model.load_state_dict(torch.load(weight_path, map_location=device))
     model.eval()
     return model
