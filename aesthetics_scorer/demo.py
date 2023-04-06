@@ -12,7 +12,7 @@ vision_model.to(DEVICE)
 del model
 clip_processor = CLIPProcessor.from_pretrained(MODEL)
 
-rating_model = load_model("aesthetics_scorer/aesthetics_scorer_openclip_vit_h_14.pth").to(DEVICE)
+rating_model = load_model("aesthetics_scorer/models/aesthetics_scorer_rating_openclip_vit_h_14.pth").to(DEVICE)
 
 def predict(img):
     inputs = clip_processor(images=img, return_tensors="pt").to(DEVICE)

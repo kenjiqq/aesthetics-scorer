@@ -10,10 +10,12 @@ from io import BytesIO
 import numpy as np
 from aesthetics_scorer.model import load_model as openclip_load_model, preprocess
 
+BUNDLE_IMAGES = False
+
 validate_df = pd.read_parquet("parquets/validate_split.parquet")
 
-def openclip_rater(model_name, embeddings_file):
-    model = openclip_load_model(f"aesthetics_scorer/{model_name}.pth").to("cuda")
+def openclip_rater(model_name, embeddings_file, max=10):
+    model = openclip_load_model(f"aesthetics_scorer/models/{model_name}.pth").to("cuda")
     embeddings_df = pd.read_parquet(embeddings_file)
     
     # Function to apply the model on a single row
@@ -21,7 +23,7 @@ def openclip_rater(model_name, embeddings_file):
         embedding = np.array(row["pooled_output"])
         embedding = preprocess(torch.from_numpy(embedding).unsqueeze(0)).to("cuda")
         with torch.no_grad():
-            prediction = torch.clamp(model(embedding), min=1, max=10)
+            prediction = torch.clamp(model(embedding), min=1, max=max)
         return prediction.item()
     
     return model_name, embeddings_df, predict
@@ -46,18 +48,20 @@ def generate_bucket_section(a, b, total_part):
     part = total_part[:100]
     html = f"<h2>In bucket {a} - {b} there is {count_part:.2f}% samples:{estimated:.2f} </h2> <div>"
     for image_name in part["image_name"]:
-        image_path = os.path.join("dataset", image_name)
-        b64_img = get_image_data_as_base64(image_path)
-        html += f'<img src="data:image/jpeg;base64,{b64_img}" height="200" />'
+        if BUNDLE_IMAGES:
+            image_path = os.path.join("dataset", image_name)
+            b64_img = get_image_data_as_base64(image_path)
+            html += f'<img src="data:image/jpeg;base64,{b64_img}" height="200" />'
+        else:
+            html += f'<img src="https://s3cdn.stability.ai/diffusion-db/{image_name}" height="200" />'
     html += "</div>"
     return html
 
-def make_html(name, df):
+def make_html(name, df, max):
     BUCKET_STEP = 0.5
-    buckets = [(i, i + BUCKET_STEP) for i in np.arange(1, 10, BUCKET_STEP)]
+    buckets = [(i, i + BUCKET_STEP) for i in np.arange(1, max, BUCKET_STEP)]
     
-    html = f'<h1>Rated images in buckets for {name}</h1>'
-
+    html = f'<h1>{name} scores on {len(df)} validation samples</h1>'
     for [a, b] in buckets:
         total_part = df[((df[name]) * 1 >= a) & ((df[name]) * 1 <= b)]
         html += generate_bucket_section(a, b, total_part)
@@ -65,15 +69,18 @@ def make_html(name, df):
     with open(f"./visualize/visualize-{name}.html", "w") as f:
         f.write(html)
 
-for rater in [
-            lambda: openclip_rater("aesthetics_scorer_openclip_vit_bigg_14", "parquets/openclip_vit_bigg_14.parquet"), 
-            lambda: openclip_rater("aesthetics_scorer_openclip_vit_h_14", "parquets/openclip_vit_h_14.parquet"), 
-            lambda: openclip_rater("aesthetics_scorer_openclip_vit_l_14", "parquets/openclip_vit_l_14.parquet"), 
+for config in [
+            (lambda max: openclip_rater("aesthetics_scorer_rating_openclip_vit_bigg_14", "parquets/openclip_vit_bigg_14.parquet", max=max), 10), 
+            (lambda max: openclip_rater("aesthetics_scorer_rating_openclip_vit_h_14", "parquets/openclip_vit_h_14.parquet", max=max), 10),
+            (lambda max: openclip_rater("aesthetics_scorer_rating_openclip_vit_l_14", "parquets/openclip_vit_l_14.parquet", max=max), 10) ,
+            (lambda max: openclip_rater("aesthetics_scorer_artifacts_openclip_vit_bigg_14", "parquets/openclip_vit_bigg_14.parquet", max=max), 5) ,
+            (lambda max: openclip_rater("aesthetics_scorer_artifacts_openclip_vit_h_14", "parquets/openclip_vit_h_14.parquet", max=max), 5),
+            (lambda max: openclip_rater("aesthetics_scorer_artifacts_openclip_vit_l_14", "parquets/openclip_vit_l_14.parquet", max=max), 5),
         ]:
-    (name, embeddings_df, predict) = rater()
+    (name, embeddings_df, predict) = config[0](config[1])
     df = pd.merge(validate_df, embeddings_df, left_on="image_name", right_on="image_name")
     
     # Apply the model on each row
     df[name] = df.apply(predict, axis=1)
 
-    make_html(name, df)
+    make_html(name, df, max=config[1])

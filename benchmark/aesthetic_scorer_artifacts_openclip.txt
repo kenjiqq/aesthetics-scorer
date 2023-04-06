@@ -1,0 +1,5 @@
+|    | name                                             |   Full: L1 |   Full: L2 |
+|---:|:-------------------------------------------------|-----------:|-----------:|
+|  0 | aesthetics_scorer_artifacts_openclip_vit_bigg_14 |   0.912716 |    1.33036 |
+|  1 | aesthetics_scorer_artifacts_openclip_vit_h_14    |   0.912336 |    1.33146 |
+|  2 | aesthetics_scorer_artifacts_openclip_vit_l_14    |   0.919431 |    1.34543 |

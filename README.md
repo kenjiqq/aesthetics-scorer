@@ -14,12 +14,12 @@ python aesthetics_scorer/demo.py
 ## Visualized results
 
 ### Different clip models on validation split of dataset
-* [openclip_vit_bigg_14](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_openclip_vit_bigg_14.html)
-* [openclip_vit_h_14](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_openclip_vit_h_14.html)
-* [openclip_vit_l_14](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_openclip_vit_l_14.html)
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_rating_openclip_vit_bigg_14.html) | [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_artifacts_openclip_vit_bigg_14.html) | openclip_vit_bigg_14
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_rating_openclip_vit_h_14.html) | [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_artifacts_openclip_vit_h_14.html) | openclip_vit_h_14
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_rating_openclip_vit_l_14.html) | [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_artifacts_openclip_vit_l_14.html) | openclip_vit_l_14
 
 ### Openclip_vit_h_14 model on subset of laion5b
-* [laion5b](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/laion5b-visualize.html)
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/laion5b-rating-visualize.html) | [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/laion5b-artifacts-visualize.html)
 
 ## Credits
 * Inspired by https://github.com/christophschuhmann/improved-aesthetic-predictor

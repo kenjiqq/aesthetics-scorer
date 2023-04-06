@@ -15,6 +15,8 @@ MODEL_NAME = "openclip_vit_bigg_14"
 
 SWEEP = False
 
+SCORE_TYPE = "artifacts" # "rating", "artifacts"
+
 config =dict({
     "epochs": 25,
     "learning_rate": 1e-3,
@@ -32,7 +34,7 @@ config =dict({
 })
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-save_name = f"aesthetics_scorer/aesthetics_scorer_{MODEL_NAME}.pth"
+save_name = f"aesthetics_scorer/models/aesthetics_scorer_{SCORE_TYPE}_{MODEL_NAME}.pth"
 
 # load the training data 
 embeddings_df = pd.read_parquet(EMBEDDING_FILE)
@@ -41,29 +43,33 @@ train_df = pd.merge(train_df, embeddings_df, left_on="image_name", right_on="ima
 validate_df = pd.read_parquet("parquets/validate_split.parquet")
 validate_df = pd.merge(validate_df, embeddings_df, left_on="image_name", right_on="image_name")
 
+# filter out images that have NaN column values
+train_df = train_df[~train_df[SCORE_TYPE].isna()]
+validate_df = validate_df[~validate_df[SCORE_TYPE].isna()]
+
 def main():
     # start a new wandb run to track this script
     with wandb.init(
         #mode="disabled",
         # set the wandb project where this run will be logged
         project="aesthetics_scorer",
-        tags=f"{MODEL_NAME}",
+        tags=[f"{MODEL_NAME}", SCORE_TYPE],
         config=config
     ):
         def prepare_data_loader(df, shuffle=False):
             embeddings = torch.tensor(np.array(df[wandb.config["embedding_type"]].to_list()))
             if wandb.config["normalize"]:
                 embeddings = preprocess(embeddings)
-            ratings = torch.tensor(np.array(df["rating"].to_list()).astype("float32"))
-            ratings = ratings.reshape(-1, 1)
-            dataset = TensorDataset(embeddings, ratings) 
+            scores = torch.tensor(np.array(df[SCORE_TYPE].to_list()).astype("float32"))
+            scores = scores.reshape(-1, 1)
+            dataset = TensorDataset(embeddings, scores) 
             loader = DataLoader(dataset, batch_size=wandb.config["batch_size"], shuffle=shuffle)
             return loader
         
         # setup validation loaders
         val_loader = prepare_data_loader(validate_df, shuffle=False)
-        lowest_rating_count = min(validate_df["rating"].value_counts() )
-        balanced_val_df = validate_df.groupby("rating").apply(lambda x: x.sample(n=lowest_rating_count, random_state=42)).reset_index(drop=True)
+        lowest_score_count = min(validate_df[SCORE_TYPE].value_counts() )
+        balanced_val_df = validate_df.groupby(SCORE_TYPE).apply(lambda x: x.sample(n=lowest_score_count, random_state=42)).reset_index(drop=True)
         balanced_val_loader = prepare_data_loader(balanced_val_df, shuffle=False)
 
         # initialize model
@@ -138,8 +144,8 @@ def main():
 
         if wandb.config["balanced_finetune"]:
             # Finetune on balanced training set
-            lowest_rating_count = min(train_df["rating"].value_counts() )
-            balanced_train_df = train_df.groupby("rating").apply(lambda x: x.sample(n=lowest_rating_count, random_state=42)).reset_index(drop=True)
+            lowest_score_count = min(train_df[SCORE_TYPE].value_counts() )
+            balanced_train_df = train_df.groupby(SCORE_TYPE).apply(lambda x: x.sample(n=lowest_score_count, random_state=42)).reset_index(drop=True)
             balanced_train_loader = prepare_data_loader(balanced_train_df, shuffle=True)
             train(balanced_train_loader, wandb.config["scheduler"], wandb.config["balanced_learning_rate"])
 
