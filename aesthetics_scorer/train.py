@@ -10,12 +10,12 @@ from transformers import get_cosine_schedule_with_warmup, get_constant_schedule
 
 from model import AestheticScorer, preprocess
 
-EMBEDDING_FILE = "parquets/openclip_vit_bigg_14.parquet"
-MODEL_NAME = "openclip_vit_bigg_14"
+EMBEDDING_FILE = "parquets/openclip_vit_h_14.parquet"
+MODEL_NAME = "openclip_vit_h_14"
+SCORE_TYPE = "rating" # "rating", "artifacts"
 
 SWEEP = False
 
-SCORE_TYPE = "artifacts" # "rating", "artifacts"
 
 config =dict({
     "epochs": 25,
