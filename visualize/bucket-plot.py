@@ -14,7 +14,7 @@ BUNDLE_IMAGES = False
 
 validate_df = pd.read_parquet("parquets/validate_split.parquet")
 
-def openclip_rater(model_name, embeddings_file, max=10):
+def openclip_rater(model_name, embeddings_file, min=1, max=10):
     model = openclip_load_model(f"aesthetics_scorer/models/{model_name}.pth").to("cuda")
     embeddings_df = pd.read_parquet(embeddings_file)
     
@@ -23,7 +23,7 @@ def openclip_rater(model_name, embeddings_file, max=10):
         embedding = np.array(row["pooled_output"])
         embedding = preprocess(torch.from_numpy(embedding).unsqueeze(0)).to("cuda")
         with torch.no_grad():
-            prediction = torch.clamp(model(embedding), min=1, max=max)
+            prediction = torch.clamp(model(embedding), min=min, max=max)
         return prediction.item()
     
     return model_name, embeddings_df, predict
@@ -57,9 +57,9 @@ def generate_bucket_section(a, b, total_part):
     html += "</div>"
     return html
 
-def make_html(name, df, max):
+def make_html(name, df, min, max):
     BUCKET_STEP = 0.5
-    buckets = [(i, i + BUCKET_STEP) for i in np.arange(1, max, BUCKET_STEP)]
+    buckets = [(i, i + BUCKET_STEP) for i in np.arange(min, max, BUCKET_STEP)]
     
     html = f'<h1>{name} scores on {len(df)} validation samples</h1>'
     for [a, b] in buckets:
@@ -70,17 +70,17 @@ def make_html(name, df, max):
         f.write(html)
 
 for config in [
-            (lambda max: openclip_rater("aesthetics_scorer_rating_openclip_vit_bigg_14", "parquets/openclip_vit_bigg_14.parquet", max=max), 10), 
-            (lambda max: openclip_rater("aesthetics_scorer_rating_openclip_vit_h_14", "parquets/openclip_vit_h_14.parquet", max=max), 10),
-            (lambda max: openclip_rater("aesthetics_scorer_rating_openclip_vit_l_14", "parquets/openclip_vit_l_14.parquet", max=max), 10) ,
-            (lambda max: openclip_rater("aesthetics_scorer_artifacts_openclip_vit_bigg_14", "parquets/openclip_vit_bigg_14.parquet", max=max), 5) ,
-            (lambda max: openclip_rater("aesthetics_scorer_artifacts_openclip_vit_h_14", "parquets/openclip_vit_h_14.parquet", max=max), 5),
-            (lambda max: openclip_rater("aesthetics_scorer_artifacts_openclip_vit_l_14", "parquets/openclip_vit_l_14.parquet", max=max), 5),
+            (lambda min, max: openclip_rater("aesthetics_scorer_rating_openclip_vit_bigg_14", "parquets/openclip_vit_bigg_14.parquet", min, max), 1, 10), 
+            (lambda min, max: openclip_rater("aesthetics_scorer_rating_openclip_vit_h_14", "parquets/openclip_vit_h_14.parquet", min, max), 1, 10),
+            (lambda min, max: openclip_rater("aesthetics_scorer_rating_openclip_vit_l_14", "parquets/openclip_vit_l_14.parquet", min, max), 1, 10) ,
+            (lambda min, max: openclip_rater("aesthetics_scorer_artifacts_openclip_vit_bigg_14", "parquets/openclip_vit_bigg_14.parquet", min, max), 0, 5) ,
+            (lambda min, max: openclip_rater("aesthetics_scorer_artifacts_openclip_vit_h_14", "parquets/openclip_vit_h_14.parquet", min, max), 0, 5),
+            (lambda min, max: openclip_rater("aesthetics_scorer_artifacts_openclip_vit_l_14", "parquets/openclip_vit_l_14.parquet", min, max), 0, 5),
         ]:
-    (name, embeddings_df, predict) = config[0](config[1])
+    (name, embeddings_df, predict) = config[0](config[1], config[2])
     df = pd.merge(validate_df, embeddings_df, left_on="image_name", right_on="image_name")
     
     # Apply the model on each row
     df[name] = df.apply(predict, axis=1)
 
-    make_html(name, df, max=config[1])
+    make_html(name, df, min=config[1], max=config[2])
