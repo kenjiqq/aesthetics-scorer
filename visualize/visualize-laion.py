@@ -42,18 +42,18 @@ for pos in tqdm(range(0, len(embeddings), BATCH_SIZE)):
    batch_embeddings = preprocess(torch.Tensor(batch_embeddings).to(device))
    with torch.no_grad():
       rating_prediction = torch.clamp(rating_model(batch_embeddings), 1, 10)
-      artifacts_prediction  = torch.clamp(artifacts_model(batch_embeddings), 1, 5)
+      artifacts_prediction  = torch.clamp(artifacts_model(batch_embeddings), 0, 5)
    rating_predictions.extend([x.item() for x in rating_prediction.detach().cpu()])
    artifacts_predictions.extend([x.item() for x in artifacts_prediction.detach().cpu()])
 
 
-for predictions, name, max_value in ((rating_predictions, "rating", 10), (artifacts_predictions, "artifacts", 5)):
+for predictions, name, min_value, max_value in ((rating_predictions, "rating", 1, 10), (artifacts_predictions, "artifacts", 0, 5)):
     df = pd.DataFrame(list(zip(urls, predictions)),
     columns =['filepath', 'prediction'])
 
 
     BUCKET_STEP = 0.5
-    buckets = [(i, i + BUCKET_STEP) for i in np.arange(1, max_value, BUCKET_STEP)]
+    buckets = [(i, i + BUCKET_STEP) for i in np.arange(min_value, max_value, BUCKET_STEP)]
 
 
     html= f"<h1>Aesthetic {name} scores for {len(predictions)} LAION 5b samples</h1>"
