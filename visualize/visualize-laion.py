@@ -1,6 +1,5 @@
 # Based on from https://raw.githubusercontent.com/christophschuhmann/improved-aesthetic-predictor/main/visulaize_100k_from_LAION400M.py
 
-# os.environ["CUDA_VISIBLE_DEVICES"] = "0"    # choose GPU if you are on a multi GPU server
 import numpy as np
 import torch
 from tqdm import tqdm
@@ -66,9 +65,10 @@ for predictions, name, min_value, max_value in ((rating_predictions, "rating", 1
 
         html+=f"<h2>In bucket {a} - {b} there is {count_part:.2f}% samples:{estimated:.2f} </h2> <div>"
         for filepath in part["filepath"]:
+            
             html+='<img src="'+filepath +'" height="200" />'
 
         html+="</div>"
-    with open(f"visualize/laion5b-{name}-visualize.html", "w") as f:
+    with open(f"visualize/laion/visualize-laion5b-{name}.html", "w") as f:
         f.write(html)
     

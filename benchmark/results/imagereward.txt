@@ -1,0 +1,7 @@
+| model                                               |   accuracy |
+|:----------------------------------------------------|-----------:|
+| aesthetics_scorer_rating_openclip_vit_bigg_14.pth   |    60.0094 |
+| aesthetics_scorer_rating_openclip_vit_h_14.pth      |    59.9625 |
+| aesthetics_scorer_rating_openclip_vit_l_14.pth      |    59.7593 |
+| aesthetics_rating_convnext_large_2e_b2e.safetensors |    55.4149 |
+| aesthetics_rating_realfake_2e_b2e.safetensors       |    56.1338 |

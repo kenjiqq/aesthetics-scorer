@@ -3,6 +3,7 @@ import torch.nn as nn
 import timm
 from safetensors import safe_open
 from safetensors.torch import save_file
+import torchvision.transforms as transforms
 import collections
 import os
 import json
@@ -25,8 +26,6 @@ class ConvnextAestheticsScorer(nn.Module):
         new_head = list(self.model.head.named_children())[:-1] + [('fc', mlp)]
         self.model.head = nn.Sequential(collections.OrderedDict(new_head))
 
-
-
     def forward(self, images):
         out = self.model(images)
         return out
@@ -39,7 +38,7 @@ class ConvnextAestheticsScorer(nn.Module):
         save_file(self.state_dict(), save_name)
 
 
-def load_model(path, new_head=False, new_head_layer_count=1):
+def load_model(path, new_head=False, new_head_layer_count=2):
     split_path = os.path.splitext(path)
     with open(f"{split_path[0]}.config", "r") as config_file:
         config = json.load(config_file)
@@ -61,6 +60,25 @@ def load_model(path, new_head=False, new_head_layer_count=1):
 
     model.load_state_dict(weights)
     return model
+
+
+def get_transforms(train):
+    if train:
+        return transforms.Compose([
+            transforms.Resize((256, 256)),
+            transforms.RandomCrop(224),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+        ])
+    else:
+        return transforms.Compose([
+            transforms.Resize((256, 256)),
+            transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+        ])
 
 
 if __name__ == "__main__":

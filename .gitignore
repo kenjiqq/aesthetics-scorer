@@ -7,3 +7,5 @@ wandb/
 parquets/
 laion2b/dataset/
 laion2b/parquet/
+repositories/
+visualize/cache/

@@ -3,3 +3,5 @@
 |  0 | aesthetics_scorer_artifacts_openclip_vit_bigg_14 |   0.912716 |    1.33036 |
 |  1 | aesthetics_scorer_artifacts_openclip_vit_h_14    |   0.912336 |    1.33146 |
 |  2 | aesthetics_scorer_artifacts_openclip_vit_l_14    |   0.919431 |    1.34543 |
+|  3 | aesthetics_artifacts_convnext_large_2e_b2e       |   0.931754 |    1.39035 |
+|  4 | aesthetics_artifacts_realfake_2e_b2e             |   1.03114  |    1.6928  |

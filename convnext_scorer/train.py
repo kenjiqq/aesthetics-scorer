@@ -12,31 +12,32 @@ from tqdm import tqdm
 import wandb
 from transformers import get_cosine_schedule_with_warmup, get_constant_schedule
 from torchvision.io import read_image, ImageReadMode
-import torchvision.transforms as transforms
 from torchinfo import summary
 from timm.models.convnext import ConvNeXtStage
-from model import ConvnextAestheticsScorer, load_model
+from convnext_scorer.dataset import prepare_data_loader
+from model import ConvnextAestheticsScorer, load_model, get_transforms
+from dataset import AestheticDataset
 
 MODEL_NAME = "convnext_large" #convnext_large_fake_detector, convnext_large
 SCORE_TYPE = "artifacts" # "rating", "artifacts"
 
 SWEEP = False
 
-
 config =dict({
-    "epochs": 1,
-    "balanced_epochs": 10,
+    "epochs": 2,
+    "balanced_epochs": 2,
     "learning_rate": 1e-4,
-    "batch_size": 64,
-    "gradient_accumulation": 1,
-    "scheduler": "constant", # "cosine", "constant",
+    "batch_size": 32,
+    "gradient_accumulation": 2,
+    "scheduler": "cosine", # "cosine", "constant",
     "output_activation": None, # "sigmoid", None,
     "frozen_epochs": None,
     "unfreeze_layers": [""],
     "balanced_finetune": True,
     "balanced_learning_rate": 1e-4,
     "head_layer_count": 2,
-    "resume": "convnext_scorer/models/aesthetics_scorer_artifacts_convnext_large_unfrozen_2e.safetensors",
+    "resume": None, #"convnext_scorer/fake_detector_model.safetensors",
+    #"resume_new_head": True,
 })
 
 if config["frozen_epochs"] == None:
@@ -45,48 +46,7 @@ if config["frozen_epochs"] == None:
 torch.manual_seed(17)
 
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
-save_name = f"convnext_scorer/models/aesthetics_scorer_{SCORE_TYPE}_{MODEL_NAME}.safetensors"
-
-def get_transforms(train):
-    if train:
-        return transforms.Compose([
-            transforms.Resize((256, 256)),
-            transforms.RandomCrop(224),
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomVerticalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-        ])
-    else:
-        return transforms.Compose([
-            transforms.Resize((256, 256)),
-            transforms.CenterCrop(224),
-            transforms.ToTensor(),
-            transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-        ])
-
-# custom dataset for loading images from a dataframe
-class AestheticDataset(Dataset):
-    def __init__(self, df, transforms):
-        self.df = df
-        self._length = len(self.df)
-        # add transforms
-        self.transforms = transforms
-
-    def __len__(self):
-        return self._length
-
-    def __getitem__(self, idx):
-        if torch.is_tensor(idx):
-            idx = idx.tolist()
-        row = self.df.iloc[idx]
-        # check what relative path resolves to
-
-        # read image with PIL
-        img = Image.open(os.path.join("dataset/", row["image_name"])).convert("RGB")
-        img = self.transforms(img)
-        label = torch.Tensor([row["label"]])
-        return img, label
+save_name = f"convnext_scorer/models/aesthetics_{SCORE_TYPE}_{MODEL_NAME}.safetensors"
 
 def main():
     config["effective_batch_size"] = config["batch_size"] * config["gradient_accumulation"] if config["gradient_accumulation"] > 1 else config["batch_size"]
@@ -98,40 +58,28 @@ def main():
         tags=["convnext", f"{MODEL_NAME}", SCORE_TYPE],
         config=config
     ):
-        def prepare_data_loader(path, shuffle=False, transforms=None):
-            df = pd.read_parquet(path)
-            # filter out images that have NaN column values
-            df = df[~df[SCORE_TYPE].isna()]
-            df = df[["image_name", SCORE_TYPE]].rename(columns={SCORE_TYPE: "label"})
-            lowest_score_count = min(df["label"].value_counts() )
-            balanced_df = df.groupby("label").apply(lambda x: x.sample(n=lowest_score_count, random_state=42)).reset_index(drop=True)
-
-            dataset = AestheticDataset(df, transforms=transforms)
-            balanced_dataset = AestheticDataset(balanced_df, transforms=transforms)
-            loader = DataLoader(dataset, batch_size=wandb.config["batch_size"], shuffle=shuffle, pin_memory=True, num_workers=8)
-            balanced_loader = DataLoader(balanced_dataset, batch_size=wandb.config["batch_size"], shuffle=shuffle, pin_memory=True, num_workers=8)
-            return loader, balanced_loader
         
         # setup validation loaders
-        val_loader, balanced_val_loader = prepare_data_loader("parquets/validate_split.parquet", shuffle=False, transforms=get_transforms(False))
+        val_loader, balanced_val_loader = prepare_data_loader("parquets/validate_split.parquet", SCORE_TYPE, wandb.config["batch_size"], shuffle=False, train=False)
 
         # initialize model
         if wandb.config["resume"] != None:
-            model = load_model(wandb.config["resume"]).to(device)
+            model = load_model(wandb.config["resume"], new_head=wandb.config["resume_new_head"]).to(device)
         else:
             model = ConvnextAestheticsScorer(model=MODEL_NAME, pretrained=True, head_layer_count=wandb.config["head_layer_count"]).to(device)
 
-
-        for params in model.parameters():
-            params.requires_grad = False
-        for params in model.model.head.parameters():
-            params.requires_grad = True
-
-        if wandb.config["frozen_epochs"] == None:
-            summary(model, input_size=(1, 3, 224, 224), depth=5, col_names=["input_size", "output_size", "num_params", "trainable"])
-
+        global_epoch = 0
         
-        def train(train_loader, scheduler, epochs, lr):
+        def train(train_loader, scheduler, epochs, lr, unfreeze = True):
+            nonlocal global_epoch
+
+            for params in model.parameters():
+                params.requires_grad = False
+            for params in model.model.head.parameters():
+                params.requires_grad = True
+
+            if wandb.config["frozen_epochs"] == None or unfreeze == False:
+                summary(model, input_size=(1, 3, 224, 224), depth=5, col_names=["input_size", "output_size", "num_params", "trainable"])
             gradient_accumulation_steps = wandb.config["gradient_accumulation"] if wandb.config["gradient_accumulation"] > 1 else 1
             total_steps = (epochs * len(train_loader)) // gradient_accumulation_steps
             # setup adamw optimizer with only params that require grad
@@ -146,12 +94,13 @@ def main():
             criterion_mae = nn.L1Loss()
 
             model.train()
-            
-            for epoch in range(epochs):
+
+            for epoch in range(global_epoch, global_epoch + epochs):
                 print(f"------------ Epoch {epoch} ------------")
+
                 
                 # unfreeze model after frozen period
-                if epoch == wandb.config["frozen_epochs"]:
+                if unfreeze == True and epoch == wandb.config["frozen_epochs"]:
                     print("Unfreezing model parameters")
                     unfree_layers = tuple(wandb.config["unfreeze_layers"])
                     for name, module in model.named_modules():
@@ -209,16 +158,19 @@ def main():
                 wandb.log({ "balanced_val_mse_loss": balanced_val_loss_mse, "balanced_val_mae_loss":  balanced_val_loss_mae, "epoch": epoch })
                 print('Balanced Validation: MSE Loss %6.4f' % (balanced_val_loss_mse))
                 print('Balanced Validation: MAE Loss %6.4f' % (balanced_val_loss_mae))
+            
+                global_epoch += 1
 
         # Full training set
-        train_loader, balanced_train_loader = prepare_data_loader("parquets/train_split.parquet", shuffle=True, transforms=get_transforms(True))
+        train_loader, balanced_train_loader = prepare_data_loader("parquets/train_split.parquet", SCORE_TYPE, wandb.config["batch_size"], shuffle=True, train=True)
         train(train_loader, wandb.config["scheduler"], wandb.config["epochs"], wandb.config["learning_rate"])
 
         if wandb.config["balanced_finetune"]:
             # Finetune on balanced training set
-            print("--------------------")
+            print("----------------------------------------")
             print("Finetuning on balanced training set")
-            train(balanced_train_loader, wandb.config["scheduler"], wandb.config["balanced_epochs"], wandb.config["balanced_learning_rate"])
+            print("----------------------------------------")
+            train(balanced_train_loader, wandb.config["scheduler"], wandb.config["balanced_epochs"], wandb.config["balanced_learning_rate"], unfreeze=False)
 
         model.save(save_name)
         print("Training done")

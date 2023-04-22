@@ -6,13 +6,43 @@ Predicts aesthetic scores for images. Trained on AI Horde community ratings of S
 
 ## Visualized results
 
-### Different clip models on validation split of dataset
-* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_rating_openclip_vit_bigg_14.html) | [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_artifacts_openclip_vit_bigg_14.html) | openclip_vit_bigg_14
-* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_rating_openclip_vit_h_14.html) | [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_artifacts_openclip_vit_h_14.html) | openclip_vit_h_14
-* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_rating_openclip_vit_l_14.html) | [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-aesthetics_scorer_artifacts_openclip_vit_l_14.html) | openclip_vit_l_14
+### Validation split of diffusiondb dataset
 
-### Openclip_vit_h_14 model on subset of laion5b
-* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/laion5b-rating-visualize.html) | [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/laion5b-artifacts-visualize.html)
+#### OpenClip models
+
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_scorer_rating_openclip_vit_bigg_14.html) 
+| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_scorer_artifacts_openclip_vit_bigg_14.html) 
+| openclip_vit_bigg_14
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_scorer_rating_openclip_vit_h_14.html) 
+| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_scorer_artifacts_openclip_vit_h_14.html) 
+| openclip_vit_h_14
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_scorer_rating_openclip_vit_l_14.html) 
+| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_scorer_artifacts_openclip_vit_l_14.html) 
+| openclip_vit_l_14
+
+#### Convnext models
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_artifacts_convnext_large_2e_b2e.html)
+| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_rating_convnext_large_2e_b2e.html) 
+| convnext_large
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_artifacts_realfake_2e_b2e.html)
+| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_rating_realfake_2e_b2e.html) 
+| realfake
+
+### Subset of laion5b
+
+####  OpenClip models
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-laion5b-rating-openclip_vit_h_14.html) 
+| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-laion5b-artifacts-openclip_vit_h_14.html)
+| openclip_vit_h_14
+
+#### Convnext models
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-laion5b-artifacts-aesthetics_artifacts_convnext_large_2e_b2e.html) 
+| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-laion5b-rating-aesthetics_rating_convnext_large_2e_b2e.html)
+| convnext_large
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-laion5b-artifacts-aesthetics_artifacts_realfake_2e_b2e.html) 
+| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-laion5b-rating-aesthetics_rating_realfake_2e_b2e.html)
+| realfake
+
 
 ## Usage 
 
