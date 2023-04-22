@@ -21,11 +21,11 @@ Predicts aesthetic scores for images. Trained on AI Horde community ratings of S
 | openclip_vit_l_14
 
 #### Convnext models
-* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_artifacts_convnext_large_2e_b2e.html)
-| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_rating_convnext_large_2e_b2e.html) 
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_rating_convnext_large_2e_b2e.html)
+| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_artifacts_convnext_large_2e_b2e.html) 
 | convnext_large
-* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_artifacts_realfake_2e_b2e.html)
-| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_rating_realfake_2e_b2e.html) 
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_rating_realfake_2e_b2e.html)
+| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/diffusiondb/visualize-aesthetics_artifacts_realfake_2e_b2e.html) 
 | realfake
 
 ### Subset of laion5b
@@ -36,11 +36,11 @@ Predicts aesthetic scores for images. Trained on AI Horde community ratings of S
 | openclip_vit_h_14
 
 #### Convnext models
-* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-laion5b-artifacts-aesthetics_artifacts_convnext_large_2e_b2e.html) 
-| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-laion5b-rating-aesthetics_rating_convnext_large_2e_b2e.html)
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-laion5b-rating-aesthetics_rating_convnext_large_2e_b2e.html) 
+| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-laion5b-artifacts-aesthetics_artifacts_convnext_large_2e_b2e.html)
 | convnext_large
-* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-laion5b-artifacts-aesthetics_artifacts_realfake_2e_b2e.html) 
-| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-laion5b-rating-aesthetics_rating_realfake_2e_b2e.html)
+* [ratings](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-laion5b-rating-aesthetics_rating_realfake_2e_b2e.html) 
+| [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/visualize-laion5b-artifacts-aesthetics_artifacts_realfake_2e_b2e.html)
 | realfake
 
 
