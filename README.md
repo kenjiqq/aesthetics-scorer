@@ -45,9 +45,21 @@ Predicts aesthetic scores for images. Trained on AI Horde community ratings of S
 | [artifacts](https://htmlpreview.github.io/?https://github.com/kenjiqq/aesthetics-scorer/blob/main/visualize/laion/visualize-laion5b-artifacts-aesthetics_artifacts_realfake_2e_b2e.html)
 | realfake
 
+## Benchmarks
+
+#### Validation Loss
+
+* [Rating](https://raw.githubusercontent.com/kenjiqq/aesthetics-scorer/main/benchmark/results/validation_rating.txt)
+* [Artifacts](https://raw.githubusercontent.com/kenjiqq/aesthetics-scorer/main/benchmark/results/validation_artifacts.txt)
+
+#### ImageReward accuracy
+
+Accuracy score on testset from https://github.com/THUDM/ImageReward#reproduce-experiments-in-table-2
+
+* [Results](https://raw.githubusercontent.com/kenjiqq/aesthetics-scorer/main/benchmark/results/imagereward.txt)
+
 
 ## Usage 
-
 
 Model files in aesthetics_scorer/models folder
 
