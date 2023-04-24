@@ -1,22 +1,29 @@
 from bs4 import BeautifulSoup
+import os
+import glob
 
 # List of URLs to remove
 nsfw_links = [
 ]
-for file_name in ("laion5b-rating-visualize.html", "laion5b-artifacts-visualize.html"):
-    # Read the HTML content from the input file
-    with open(f"visualize/{file_name}", "r") as f:
-        html = f.read()
 
-    soup = BeautifulSoup(html, "html.parser")
+folders = ['visualize/laion']
+for folder in folders:
+    html_files = glob.glob(os.path.join(folder, '*.html'))
+    for html_file in html_files:
+        print(f"Cleaning {html_file}...")
+        # Read the HTML content from the input file
+        with open(html_file, "r") as f:
+            html = f.read()
 
-    # Find all img tags
-    img_tags = soup.find_all("img")
+        soup = BeautifulSoup(html, "html.parser")
 
-    for img in img_tags:
-        if img["src"] in nsfw_links:
-            img.decompose()
+        # Find all img tags
+        img_tags = soup.find_all("img")
 
-    # Write the modified HTML content to the output file
-    with open(f"visualize/{file_name}", "w") as f:
-        f.write(soup.prettify())
+        for img in img_tags:
+            if img["src"] in nsfw_links:
+                img.decompose()
+
+        # Write the modified HTML content to the output file
+        with open(html_file, "w") as f:
+            f.write(soup.prettify())
