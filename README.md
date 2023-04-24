@@ -92,6 +92,7 @@ python aesthetics_scorer/train.py
 * Inspired by https://github.com/christophschuhmann/improved-aesthetic-predictor
 * Image dataset https://poloclub.github.io/diffusiondb/
 * Image ratings by https://aihorde.net/
+* Benchmark from https://github.com/THUDM/ImageReward/
 
 ```
 @article{wangDiffusionDBLargescalePrompt2022,
@@ -125,5 +126,15 @@ python aesthetics_scorer/train.py
   version      = {0.1},
   doi          = {10.5281/zenodo.5143773},
   url          = {https://doi.org/10.5281/zenodo.5143773}
+}
+```
+```
+@misc{xu2023imagereward,
+      title={ImageReward: Learning and Evaluating Human Preferences for Text-to-Image Generation}, 
+      author={Jiazheng Xu and Xiao Liu and Yuchen Wu and Yuxuan Tong and Qinkai Li and Ming Ding and Jie Tang and Yuxiao Dong},
+      year={2023},
+      eprint={2304.05977},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV}
 }
 ```
