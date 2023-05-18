@@ -6,6 +6,7 @@ wandb/
 .vscode/
 parquets/
 laion2b/dataset/
+laion2b/dataset_old/
 laion2b/parquet/
 repositories/
 visualize/cache/
