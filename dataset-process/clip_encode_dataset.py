@@ -7,10 +7,10 @@ import os
 from transformers import CLIPModel, CLIPProcessor
 
 configs = [
-    {
-        "MODEL": "laion/CLIP-ViT-bigG-14-laion2B-39B-b160k",
-        "FILE_NAME": "openclip_vit_bigg_14"
-    },
+    # {
+    #     "MODEL": "laion/CLIP-ViT-bigG-14-laion2B-39B-b160k",
+    #     "FILE_NAME": "openclip_vit_bigg_14"
+    # },
     {
         "MODEL": "laion/CLIP-ViT-H-14-laion2B-s32B-b79K",
         "FILE_NAME": "openclip_vit_h_14"
@@ -60,6 +60,8 @@ for config in configs:
                 "pooled_output": list(pooled_output.cpu().detach().numpy()),
                 "projected_embedding": list(projected_embedding.cpu().detach().numpy()),
             })], ignore_index=True)
+        if (pos / BATCH_SIZE) % 10 == 0:
+            result_df.to_parquet(embedding_file_path)        
 
     result_df.to_parquet(embedding_file_path)
 
