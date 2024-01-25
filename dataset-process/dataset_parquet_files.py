@@ -52,7 +52,7 @@ mixed_diffusion_df = mixed_diffusion_df[mixed_diffusion_df["image_nsfw"] != 2.0 
 
 mixed_diffusion_df = mixed_diffusion_df[["image_name", "ratings_count", "rating", "artifacts", "prompt", "part_id", "width", "height"]]
 
-train_split_df, validate_split_df = np.split(mixed_diffusion_df.sample(frac=1, random_state=42), [int(0.8*len(mixed_diffusion_df))])
+train_split_df, validate_split_df = np.split(mixed_diffusion_df.sample(frac=1, random_state=42), [int(0.85*len(mixed_diffusion_df))])
 
 mixed_diffusion_df.to_parquet("parquets/prepared_hord_diffusion_dataset.parquet")
 train_split_df.to_parquet("parquets/train_split.parquet")

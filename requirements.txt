@@ -1,4 +1,4 @@
---extra-index-url https://download.pytorch.org/whl/cu117
+--extra-index-url https://download.pytorch.org/whl/cu121
 alive_progress==3.0.1
 gradio==3.23.0
 matplotlib==3.7.1
@@ -8,6 +8,8 @@ Pillow==9.4.0
 PyYAML==6.0
 requests==2.28.2
 setuptools==65.5.0
-torch==2.0.0+cu117
+torch==2.1.2+cu121
 tqdm==4.65.0
-transformers==4.33.2
+transformers==4.37.0
+open_clip_torch==2.24.0
+pyarrow==15.0.0
