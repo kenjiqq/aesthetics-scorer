@@ -94,16 +94,16 @@ if __name__ == "__main__":
     validate_df = pd.read_parquet("parquets/validate_split.parquet")
 
     for config in [
-                (openclip_rater, "aesthetics_scorer_rating_openclip_vit_bigg_14", "parquets/openclip_vit_bigg_14.parquet", 1, 10), 
-                (openclip_rater, "aesthetics_scorer_rating_openclip_vit_h_14", "parquets/openclip_vit_h_14.parquet", 1, 10),
-                (openclip_rater, "aesthetics_scorer_rating_openclip_vit_l_14", "parquets/openclip_vit_l_14.parquet", 1, 10) ,
-                (openclip_rater, "aesthetics_scorer_artifacts_openclip_vit_bigg_14", "parquets/openclip_vit_bigg_14.parquet", 0, 5) ,
-                (openclip_rater, "aesthetics_scorer_artifacts_openclip_vit_h_14", "parquets/openclip_vit_h_14.parquet", 0, 5),
-                (openclip_rater, "aesthetics_scorer_artifacts_openclip_vit_l_14", "parquets/openclip_vit_l_14.parquet", 0, 5),
-                (convnext_rater, "aesthetics_artifacts_convnext_large_2e_b2e", 0, 5),
-                (convnext_rater, "aesthetics_artifacts_realfake_2e_b2e", 0, 5),
-                (convnext_rater, "aesthetics_rating_convnext_large_2e_b2e", 1, 10),
-                (convnext_rater, "aesthetics_rating_realfake_2e_b2e", 1, 10),
+                # (openclip_rater, "aesthetics_scorer_rating_openclip_vit_bigg_14", "parquets/openclip_vit_bigg_14.parquet", 1, 10), 
+                (openclip_rater, "aesthetics_scorer_rating_dfn5b_vit_h_14", "parquets/dfn5b_vit_h_14.parquet", 1, 10),
+                # (openclip_rater, "aesthetics_scorer_rating_openclip_vit_l_14", "parquets/openclip_vit_l_14.parquet", 1, 10) ,
+                # (openclip_rater, "aesthetics_scorer_artifacts_openclip_vit_bigg_14", "parquets/openclip_vit_bigg_14.parquet", 0, 5) ,
+                # (openclip_rater, "aesthetics_scorer_artifacts_openclip_vit_h_14", "parquets/openclip_vit_h_14.parquet", 0, 5),
+                # (openclip_rater, "aesthetics_scorer_artifacts_openclip_vit_l_14", "parquets/openclip_vit_l_14.parquet", 0, 5),
+                # (convnext_rater, "aesthetics_artifacts_convnext_large_2e_b2e", 0, 5),
+                # (convnext_rater, "aesthetics_artifacts_realfake_2e_b2e", 0, 5),
+                # (convnext_rater, "aesthetics_rating_convnext_large_2e_b2e", 1, 10),
+                # (convnext_rater, "aesthetics_rating_realfake_2e_b2e", 1, 10),
             ]:
         predictions = config[0](*config[1:])
         df = validate_df.copy()

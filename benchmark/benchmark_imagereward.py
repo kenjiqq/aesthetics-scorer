@@ -8,34 +8,40 @@ from tqdm import tqdm
 from PIL import Image
 from transformers import CLIPModel, CLIPProcessor
 from aesthetics_scorer.model import preprocess, load_model as clip_load_model
+from base_model_classes.openclip import OpenClip
 from convnext_scorer.model import load_model as convnext_load_model, get_transforms as convnext_get_transforms
 import pandas as pd
 from datasets import load_dataset
 
 MODEL_CONFIG = [
+    # {
+    #     "type": "clip",
+    #     "weights": "aesthetics_scorer/models/aesthetics_scorer_rating_openclip_vit_bigg_14.pth",
+    #     "clip_model": "laion/CLIP-ViT-bigG-14-laion2B-39B-b160k"
+    # },
+    # {
+    #    "type": "clip",
+    #     "weights": "aesthetics_scorer/models/aesthetics_scorer_rating_openclip_vit_h_14.pth",
+    #     "clip_model": "laion/CLIP-ViT-H-14-laion2B-s32B-b79K"
+    # },
+    # {
+    #     "type": "clip",
+    #     "weights": "aesthetics_scorer/models/aesthetics_scorer_rating_openclip_vit_l_14.pth",
+    #     "clip_model": "laion/CLIP-ViT-L-14-laion2B-s32B-b82K"
+    # },
+    # {
+    #     "type": "convnext",
+    #     "weights": "convnext_scorer/models/aesthetics_rating_convnext_large_2e_b2e.safetensors",
+    # },
+    # {
+    #     "type": "convnext",
+    #     "weights": "convnext_scorer/models/aesthetics_rating_realfake_2e_b2e.safetensors",
+    # },
     {
-        "type": "clip",
-        "weights": "aesthetics_scorer/models/aesthetics_scorer_rating_openclip_vit_bigg_14.pth",
-        "clip_model": "laion/CLIP-ViT-bigG-14-laion2B-39B-b160k"
+        "type": "openclip",
+        "weights": "aesthetics_scorer/models/aesthetics_scorer_rating_dfn5b_vit_h_14.pth",
+        "clip_model": "hf-hub:apple/DFN5B-CLIP-ViT-H-14-384"
     },
-    {
-       "type": "clip",
-        "weights": "aesthetics_scorer/models/aesthetics_scorer_rating_openclip_vit_h_14.pth",
-        "clip_model": "laion/CLIP-ViT-H-14-laion2B-s32B-b79K"
-    },
-    {
-        "type": "clip",
-        "weights": "aesthetics_scorer/models/aesthetics_scorer_rating_openclip_vit_l_14.pth",
-        "clip_model": "laion/CLIP-ViT-L-14-laion2B-s32B-b82K"
-    },
-    {
-        "type": "convnext",
-        "weights": "convnext_scorer/models/aesthetics_rating_convnext_large_2e_b2e.safetensors",
-    },
-    {
-        "type": "convnext",
-        "weights": "convnext_scorer/models/aesthetics_rating_realfake_2e_b2e.safetensors",
-    }
 ]
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -54,6 +60,20 @@ class ClipScorer():
         with torch.no_grad():
             vision_output = self.vision_model(**inputs)
             pooled_output = vision_output.pooler_output
+            embedding = preprocess(pooled_output)
+            ratings = self.rating_model(embedding)
+ 
+        return ratings.squeeze().detach().cpu().numpy().tolist()
+    
+class OpenClipScorer():
+    def __init__(self, clip_model, weights):
+        self.model = OpenClip(clip_model).to(device)
+        self.rating_model = clip_load_model(weights).to(device)
+    
+    def rank_images(self, images):
+        inputs = self.model.process_images(images).to(device)
+        with torch.no_grad(), torch.cuda.amp.autocast():
+            pooled_output, _  = self.model(inputs)
             embedding = preprocess(pooled_output)
             ratings = self.rating_model(embedding)
  
@@ -119,8 +139,11 @@ def collate(data):
     return { "generations": [element["generations"] for element in data], "ranking": [element["ranking"] for element in data]}
 
 def test():
-    dataset = load_dataset("kenjiqq/imagereward-evaluation", split='test',)
-    loader = torch.utils.data.DataLoader(dataset, batch_size=32, shuffle=False, collate_fn=collate)
+    # some quick fix to a dataset bug that causes images not to load, can be removed later when its fixed
+    from unittest.mock import patch
+    with patch("datasets.config.USE_PARQUET_EXPORT", False):
+        dataset = load_dataset("kenjiqq/imagereward-evaluation", split='test')
+    loader = torch.utils.data.DataLoader(dataset, batch_size=16, shuffle=False, collate_fn=collate)
     result_df = pd.DataFrame(columns =["model", "accuracy"])
 
     for config in MODEL_CONFIG:
@@ -128,6 +151,8 @@ def test():
         samples = []
         if config["type"] == "clip":
             model = ClipScorer(config["clip_model"], config["weights"])
+        elif config["type"] == "openclip":
+            model = OpenClipScorer(config["clip_model"], config["weights"])
         elif config["type"] == "convnext":
             model = ConvnextScorer(config["weights"])
 

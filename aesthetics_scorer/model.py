@@ -20,15 +20,15 @@ class AestheticScorer(nn.Module):
         layers = [
             nn.Linear(self.config["input_size"], self.config["hidden_dim"]),
             nn.ReLU() if self.config["use_activation"] else None,
-            nn.Dropout(self.config["dropout"]),
+            nn.Dropout(self.config["dropout"]) if self.config["dropout"] > 0 else None,
             
             nn.Linear(self.config["hidden_dim"], round(self.config["hidden_dim"] / (2 if reduce_dims else 1))),
             nn.ReLU() if self.config["use_activation"] else None,
-            nn.Dropout(self.config["dropout"]),
+            nn.Dropout(self.config["dropout"]) if self.config["dropout"] > 0 else None,
             
             nn.Linear(round(self.config["hidden_dim"] / (2 if reduce_dims else 1)), round(self.config["hidden_dim"] / (4 if reduce_dims else 1))),
             nn.ReLU() if self.config["use_activation"] else None,
-            nn.Dropout(self.config["dropout"]),
+            nn.Dropout(self.config["dropout"]) if self.config["dropout"] > 0 else None,
             
             nn.Linear(round(self.config["hidden_dim"] / (4 if reduce_dims else 1)), round(self.config["hidden_dim"] / (8 if reduce_dims else 1))),
             nn.ReLU() if self.config["use_activation"] else None,
